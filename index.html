@@ -3,81 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Biomasa - Registro de Biometría</title>
+    <title>Sistema de Control de Biomasa - Alta Densidad</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #2c3e50; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        input[readonly] { background-color: #e9ecef; color: #495057; font-weight: bold; }
-        button { background-color: #3498db; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        button:hover { background-color: #2980b9; }
-        .alert { padding: 15px; margin-top: 20px; border-radius: 4px; display: none; }
-        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            color: #64748b;
+        }
+
+        /* Sistema de Pestañas */
+        .tabs-nav {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tabs-nav::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tabs-nav::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .tab-btn {
+            background-color: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background-color: #cbd5e1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .tab-btn.resumen-btn {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .tab-btn.resumen-btn.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Contenedores de Contenido */
+        .tab-content {
+            display: none;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Estilos Pestaña Resumen */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
+
+        .card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .resumen-table-container {
+            overflow-x: auto;
+        }
+
+        .resumen-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .resumen-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 12px 15px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .resumen-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 15px;
+        }
+
+        .resumen-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-biometria { background-color: #dcfce7; color: #15803d; }
+        .status-vacio { background-color: #f1f5f9; color: #475569; }
+
+        /* Estilos Formularios de Unidades */
+        .form-title {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #334155;
+            background-color: #fff;
+        }
+
+        .form-group input[readonly] {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: not-allowed;
+            font-weight: 600;
+        }
+
+        .btn-submit {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-submit:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Notificaciones */
+        .alert {
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .alert-success { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        
+        .loading-overlay {
+            background-color: rgba(255,255,255,0.8);
+            color: var(--primary-color);
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Registro de Biometría y Mortalidad</h2>
-    
-    <div class="form-group">
-        <label for="unidad">Unidad de Producción:</label>
-        <select id="unidad">
-            <option value="">-- Seleccione Unidad --</option>
-            <option value="CANAL 1">CANAL 1 (Cachama)</option>
-            <option value="CANAL 2">CANAL 2 (Bocachico)</option>
-            <option value="CANAL 3">CANAL 3 (Cachama)</option>
-            <option value="CANAL 4">CANAL 4 (Cachama)</option>
-            <option value="CANAL 5">CANAL 5 (Cachama)</option>
-            <option value="ESTANQUE 1">ESTANQUE 1 (Cachama)</option>
-            <option value="ESTANQUE 2">ESTANQUE 2 (Cachama)</option>
-            <option value="ESTANQUE 3">ESTANQUE 3 (Vacío)</option>
-            <option value="ESTANQUE 4">ESTANQUE 4 (Cachama)</option>
-            <option value="ESTANQUE 5">ESTANQUE 5 (Cachama)</option>
-        </select>
+    <header>
+        <h1>Control de Biomasa y Biometrías</h1>
+        <p>Estructura de Datos Relacionales - Base de Datos de Producción Acuícola</p>
+    </header>
+
+    <div id="loading" class="loading-overlay">Sincronizando datos en tiempo real con Cloud Firestore...</div>
+
+    <nav class="tabs-nav" id="tabsNav">
+        <button class="tab-btn resumen-btn active" onclick="switchTab('resumen')">📊 RESUMEN GENERAL</button>
+        </nav>
+
+    <div id="resumen" class="tab-content active">
+        <div class="grid-cards">
+            <div class="card">
+                <h3>Biomasa Total Global</h3>
+                <div class="value" id="totalBiomasaGlobal">0.00 Kg</div>
+            </div>
+            <div class="card">
+                <h3>Peces Vivos Totales</h3>
+                <div class="value" id="totalPecesGlobal">0</div>
+            </div>
+            <div class="card">
+                <h3>Unidades Activas</h3>
+                <div class="value" id="totalUnidadesActivas">0 / 10</div>
+            </div>
+        </div>
+
+        <div class="resumen-table-container">
+            <table class="resumen-table">
+                <thead>
+                    <tr>
+                        <th>Unidad de Producción</th>
+                        <th>Especie</th>
+                        <th>Peces Vivos</th>
+                        <th>Peso Promedio (g)</th>
+                        <th>Biomasa Total (Kg)</th>
+                        <th>Estatus</th>
+                    </tr>
+                </thead>
+                <tbody id="resumenTableBody">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="pecesAnteriores">Inventario Anterior (Peces Vivos):</label>
-        <input type="number" id="pecesAnteriores" readonly>
-    </div>
-
-    <div class="form-group">
-        <label for="muertes">Mortalidad Registrada (Nº Peces):</label>
-        <input type="number" id="muertes" value="0" min="0" step="1">
-    </div>
-
-    <div class="form-group">
-        <label for="pesoPromedio">Nuevo Peso Promedio (Gramos):</label>
-        <input type="number" id="pesoPromedio" step="0.01" min="0">
-    </div>
-
-    <div class="form-group">
-        <label for="pecesActuales">Inventario Actual Calculado (Peces):</label>
-        <input type="number" id="pecesActuales" readonly>
-    </div>
-
-    <div class="form-group">
-        <label for="biomasaTotal">Biomasa Total Calculada (Kilogramos):</label>
-        <input type="number" id="biomasaTotal" readonly>
-    </div>
-
-    <button id="btnGuardar">Registrar Datos en Firebase</button>
-
-    <div id="mensajeExito" class="alert alert-success">Registro guardado exitosamente en la base de datos.</div>
-    <div id="mensajeError" class="alert alert-error">Error al guardar. Verifique la conexión o los datos.</div>
+    <div id="unidadWorkspace">
+        </div>
 </div>
 
 <script type="module">
-    // Importaciones desde el CDN oficial de Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Configuración de Firebase
+    // Tu configuración exacta de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCGuHxPVOVnPpsC5tgfJAO1_nCS-qi4ySA",
       authDomain: "pexes-salim.firebaseapp.com",
@@ -87,122 +335,246 @@
       appId: "1:64381287898:web:dc9d768ccf8cde5c85d4e3"
     };
 
-    // Inicialización
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Estado base extraído del RESUMEN.csv
-    const datosBase = {
-        "CANAL 1": { especie: "CACHAMA", vivos: 30000, peso: 15 },
-        "CANAL 2": { especie: "BOCHACHICO", vivos: 20000, peso: 118.42 },
-        "CANAL 3": { especie: "CACHAMA", vivos: 30000, peso: 45.89 },
-        "CANAL 4": { especie: "CACHAMA", vivos: 40000, peso: 41.05 },
-        "CANAL 5": { especie: "CACHAMA", vivos: 20000, peso: 288.54 },
-        "ESTANQUE 1": { especie: "CACHAMA", vivos: 70000, peso: 10.45 },
-        "ESTANQUE 2": { especie: "CACHAMA", vivos: 50000, peso: 12.95 },
-        "ESTANQUE 3": { especie: "", vivos: 0, peso: 0 },
-        "ESTANQUE 4": { especie: "CACHAMA", vivos: 70000, peso: 2.93 },
-        "ESTANQUE 5": { especie: "CACHAMA", vivos: 80000, peso: 5 }
+    // Estado local inicial derivado del archivo BIOMASA TOTAL.xlsx de la empresa
+    const clusterDatos = {
+        "CANAL_1": { nombre: "CANAL 1", especie: "CACHAMA", vivos: 30000, peso: 15.00 },
+        "CANAL_2": { nombre: "CANAL 2", especie: "BOCHACHICO", vivos: 20000, peso: 118.42 },
+        "CANAL_3": { nombre: "CANAL 3", especie: "CACHAMA", vivos: 30000, peso: 45.89 },
+        "CANAL_4": { nombre: "CANAL 4", especie: "CACHAMA", vivos: 40000, peso: 41.05 },
+        "CANAL_5": { nombre: "CANAL 5", especie: "CACHAMA", vivos: 20000, peso: 288.54 },
+        "ESTANQUE_1": { nombre: "ESTANQUE 1", especie: "CACHAMA", vivos: 70000, peso: 10.45 },
+        "ESTANQUE_2": { nombre: "ESTANQUE 2", especie: "CACHAMA", vivos: 50000, peso: 12.95 },
+        "ESTANQUE_3": { nombre: "ESTANQUE 3", especie: "VACÍO", vivos: 0, peso: 0.00 },
+        "ESTANQUE_4": { nombre: "ESTANQUE 4", especie: "CACHAMA", vivos: 70000, peso: 2.93 },
+        "ESTANQUE_5": { nombre: "ESTANQUE 5", especie: "CACHAMA", vivos: 80000, peso: 5.00 }
     };
 
-    // Referencias al DOM
-    const selectUnidad = document.getElementById('unidad');
-    const inPecesAnteriores = document.getElementById('pecesAnteriores');
-    const inMuertes = document.getElementById('muertes');
-    const inPesoPromedio = document.getElementById('pesoPromedio');
-    const inPecesActuales = document.getElementById('pecesActuales');
-    const inBiomasaTotal = document.getElementById('biomasaTotal');
-    const btnGuardar = document.getElementById('btnGuardar');
-    const msjExito = document.getElementById('mensajeExito');
-    const msjError = document.getElementById('mensajeError');
+    // Inicializar navegación por pestañas e interfaz de trabajo
+    function inicializarEntorno() {
+        const nav = document.getElementById('tabsNav');
+        const keys = Object.keys(clusterDatos);
+        
+        keys.forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn';
+            btn.id = `btn_${key}`;
+            btn.innerText = clusterDatos[key].nombre;
+            btn.onclick = () => switchTab(key);
+            nav.appendChild(btn);
+        });
 
-    let especieActual = "";
-
-    // Lógica de cálculo matemático estricto
-    function calcularValores() {
-        const anteriores = parseFloat(inPecesAnteriores.value) || 0;
-        const muertes = parseFloat(inMuertes.value) || 0;
-        const peso = parseFloat(inPesoPromedio.value) || 0;
-
-        // Ecuación 1: Inventario actual
-        const actuales = anteriores - muertes;
-        inPecesActuales.value = actuales < 0 ? 0 : actuales;
-
-        // Ecuación 2: Biomasa total en Kg
-        const biomasa = (inPecesActuales.value * peso) / 1000;
-        inBiomasaTotal.value = biomasa.toFixed(2);
+        renderizarResumen();
+        window.switchTab = switchTab; // Exportar a ámbito global
     }
 
-    // Eventos de la interfaz
-    selectUnidad.addEventListener('change', (e) => {
-        const unidad = e.target.value;
-        if (datosBase[unidad]) {
-            inPecesAnteriores.value = datosBase[unidad].vivos;
-            inPesoPromedio.value = datosBase[unidad].peso;
-            especieActual = datosBase[unidad].especie;
-            inMuertes.value = 0;
-            calcularValores();
+    // Cambiar de pestaña de forma fluida
+    function switchTab(targetId) {
+        // Desactivar todos los botones de pestañas
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        // Ocultar todos los contenedores principales
+        document.getElementById('resumen').classList.remove('active');
+        
+        const workspace = document.getElementById('unidadWorkspace');
+        workspace.innerHTML = ''; // Limpiar área de trabajo
+
+        if (targetId === 'resumen') {
+            document.getElementById('btn_resumen').classList.add('active');
+            document.getElementById('resumen').classList.add('active');
+            renderizarResumen();
         } else {
-            inPecesAnteriores.value = '';
-            inPesoPromedio.value = '';
-            inPecesActuales.value = '';
-            inBiomasaTotal.value = '';
+            document.getElementById(`btn_${targetId}`).classList.add('active');
+            montarFormularioUnidad(targetId);
         }
-    });
+    }
 
-    inMuertes.addEventListener('input', calcularValores);
-    inPesoPromedio.addEventListener('input', calcularValores);
+    // Renderizar la tabla y tarjetas dinámicas del RESUMEN
+    function renderizarResumen() {
+        const tbody = document.getElementById('resumenTableBody');
+        tbody.innerHTML = '';
 
-    // Guardado en Firestore
-    btnGuardar.addEventListener('click', async () => {
-        const unidadId = selectUnidad.value;
-        if (!unidadId) {
-            alert("Debe seleccionar una unidad de producción.");
-            return;
+        let biomasaGlobal = 0;
+        let pecesGlobal = 0;
+        let activas = 0;
+
+        Object.keys(clusterDatos).forEach(key => {
+            const u = clusterDatos[key];
+            const biomasaKg = (u.vivos * u.peso) / 1000;
+            const estatusStr = u.vivos > 0 ? 'BIOMETRIA' : 'VACIO';
+            const badgeClass = u.vivos > 0 ? 'status-biometria' : 'status-vacio';
+
+            biomasaGlobal += biomasaKg;
+            pecesGlobal += u.vivos;
+            if (u.vivos > 0) activas++;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${u.nombre}</strong></td>
+                <td>${u.especie || '---'}</td>
+                <td>${u.vivos.toLocaleString()}</td>
+                <td>${u.peso.toFixed(2)} g</td>
+                <td><strong>${biomasaKg.toFixed(2)} Kg</strong></td>
+                <td><span class="status-badge ${badgeClass}">${estatusStr}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('totalBiomasaGlobal').innerText = `${biomasaGlobal.toFixed(2)} Kg`;
+        document.getElementById('totalPecesGlobal').innerText = pecesGlobal.toLocaleString();
+        document.getElementById('totalUnidadesActivas').innerText = `${activas} / 10`;
+    }
+
+    // Montar la interfaz de registro de biometría para la pestaña seleccionada
+    function montarFormularioUnidad(key) {
+        const u = clusterDatos[key];
+        const workspace = document.getElementById('unidadWorkspace');
+        
+        const currentBiomasa = ((u.vivos * u.peso) / 1000).toFixed(2);
+
+        workspace.innerHTML = `
+            <div class="tab-content active">
+                <h2 class="form-title">${u.nombre} - Formulario de Biometría Operativa</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Especie en Cultivo:</label>
+                        <input type="text" id="form_especie" value="${u.especie}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Inventario Base (Peces Vivos):</label>
+                        <input type="number" id="form_vivos_base" value="${u.vivos}" readonly>
+                    </div>
+                </div>
+                <div class="form-grid" style="border-top: 1px solid var(--border-color); padding-top:15px;">
+                    <div class="form-group">
+                        <label>Mortalidad Retirada (Nº Peces):</label>
+                        <input type="number" id="form_muertes" value="0" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Nuevo Peso Promedio Muestreado (Gramos):</label>
+                        <input type="number" id="form_peso" value="${u.peso}" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-grid" style="background-color: #f1f5f9; padding: 15px; border-radius: 4px; margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Peces Vivos Actuales (Calculado):</label>
+                        <input type="number" id="form_vivos_calc" value="${u.vivos}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Biomasa Resultante (Calculado Kg):</label>
+                        <input type="number" id="form_biomasa_calc" value="${currentBiomasa}" readonly>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn-submit" id="btnGuardarFirestore">Ejecutar Transacción en Firebase</button>
+                </div>
+
+                <div id="okAlert" class="alert alert-success">Datos sincronizados con éxito en Firebase e Historial actualizado.</div>
+                <div id="errorAlert" class="alert alert-error">Error crítico de red al guardar en Cloud Firestore.</div>
+            </div>
+        `;
+
+        // Atar los cálculos matemáticos puros para evitar errores de captura manual
+        const inMuertes = document.getElementById('form_muertes');
+        const inPeso = document.getElementById('form_peso');
+        const inVivosCalc = document.getElementById('form_vivos_calc');
+        const inBiomasaCalc = document.getElementById('form_biomasa_calc');
+
+        function procesarCalculo() {
+            const base = parseInt(u.vivos) || 0;
+            const muertes = parseInt(inMuertes.value) || 0;
+            const pesoGramos = parseFloat(inPeso.value) || 0;
+
+            const remanente = base - muertes;
+            inVivosCalc.value = remanente < 0 ? 0 : remanente;
+
+            const biomasaKg = (inVivosCalc.value * pesoGramos) / 1000;
+            inBiomasaCalc.value = biomasaKg.toFixed(2);
         }
 
-        const dataGuardar = {
-            id_unidad: unidadId,
-            especie: especieActual,
-            muertes: parseInt(inMuertes.value),
-            cantidad_peces_vivos: parseInt(inPecesActuales.value),
-            peso_promedio_gramos: parseFloat(inPesoPromedio.value),
-            biomasa_total_kilos: parseFloat(inBiomasaTotal.value),
-            estatus: parseFloat(inPecesActuales.value) > 0 ? "BIOMETRIA" : "VACIO",
+        inMuertes.addEventListener('input', procesarCalculo);
+        inPeso.addEventListener('input', procesarCalculo);
+
+        // Configurar el botón de envío a la base de datos
+        document.getElementById('btnGuardarFirestore').addEventListener('click', () => {
+            ejecutarGuardado(key, inMuertes.value, inVivosCalc.value, inPeso.value, inBiomasaCalc.value);
+        });
+    }
+
+    // Enviar datos calculados a Firestore de forma estructurada
+    async function ejecutarGuardado(key, muertes, vivos, peso, biomasa) {
+        const btn = document.getElementById('btnGuardarFirestore');
+        const alertOk = document.getElementById('okAlert');
+        const alertErr = document.getElementById('errorAlert');
+
+        btn.disabled = true;
+        btn.innerText = "Transfiriendo...";
+
+        const payload = {
+            id_unidad: clusterDatos[key].nombre,
+            especie: clusterDatos[key].especie,
+            muertes: parseInt(muertes) || 0,
+            cantidad_peces_vivos: parseInt(vivos) || 0,
+            peso_promedio_gramos: parseFloat(peso) || 0,
+            biomasa_total_kilos: parseFloat(biomasa) || 0,
+            estatus: parseInt(vivos) > 0 ? "BIOMETRIA" : "VACIO",
             fecha_actualizacion: serverTimestamp()
         };
 
-        btnGuardar.disabled = true;
-        btnGuardar.innerText = "Guardando...";
-
         try {
-            // 1. Actualiza el documento principal (Resumen)
-            const docRef = doc(db, "unidades_produccion", unidadId.replace(/\s+/g, '_'));
-            await setDoc(docRef, dataGuardar);
+            // Documento de Estado Consolidado de la Unidad
+            const docRef = doc(db, "unidades_produccion", key);
+            await setDoc(docRef, payload);
 
-            // 2. Guarda el registro histórico en la subcolección
-            const historialRef = collection(docRef, "registros_historial");
-            await addDoc(historialRef, dataGuardar);
+            // Registro en Historial para Auditoría Continua
+            const histRef = collection(docRef, "registros_historial");
+            await addDoc(histRef, payload);
 
-            // Actualizar estado local para futuras ediciones sin recargar
-            datosBase[unidadId].vivos = dataGuardar.cantidad_peces_vivos;
-            datosBase[unidadId].peso = dataGuardar.peso_promedio_gramos;
-            inPecesAnteriores.value = dataGuardar.cantidad_peces_vivos;
-            inMuertes.value = 0;
+            // Actualizar la caché del cluster local para mantener la reactividad sin recargas de página
+            clusterDatos[key].vivos = payload.cantidad_peces_vivos;
+            clusterDatos[key].peso = payload.peso_promedio_gramos;
 
-            msjExito.style.display = 'block';
-            msjError.style.display = 'none';
-            setTimeout(() => { msjExito.style.display = 'none'; }, 4000);
+            alertOk.style.display = 'block';
+            alertErr.style.display = 'none';
+            
+            setTimeout(() => {
+                switchTab('resumen'); // Retorna al operador a la pestaña general de control
+            }, 1500);
 
-        } catch (error) {
-            console.error("Error técnico al escribir en Firestore: ", error);
-            msjError.style.display = 'block';
-            msjExito.style.display = 'none';
-        } finally {
-            btnGuardar.disabled = false;
-            btnGuardar.innerText = "Registrar Datos en Firebase";
+        } catch (e) {
+            console.error("Firestore Error:", e);
+            alertErr.style.display = 'block';
+            alertOk.style.display = 'none';
+            btn.disabled = false;
+            btn.innerText = "Ejecutar Transacción en Firebase";
         }
-    });
+    }
+
+    // Pull inicial de datos desde Cloud Firestore para sobreescribir la base estática si ya existen registros previos
+    async function sincronizarServidor() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "unidades_produccion"));
+            querySnapshot.forEach((doc) => {
+                const key = doc.id;
+                if (clusterDatos[key]) {
+                    const dbData = doc.data();
+                    clusterDatos[key].vivos = dbData.cantidad_peces_vivos;
+                    clusterDatos[key].peso = dbData.peso_promedio_gramos;
+                    clusterDatos[key].especie = dbData.especie;
+                }
+            });
+        } catch (err) {
+            console.warn("Modo local activado. Usando datos base de Excel precargados.", err);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+            inicializarEntorno();
+        }
+    }
+
+    // Arrancar el flujo del sistema
+    sincronizarServidor();
 </script>
 </body>
 </html>
