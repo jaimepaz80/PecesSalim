@@ -439,6 +439,10 @@
                         <input type="number" id="form_muertes" value="0" min="0" step="1">
                     </div>
                     <div class="form-group">
+                        <label>Siembra / Adición (Nº Peces):</label>
+                        <input type="number" id="form_siembra" value="0" min="0" step="1">
+                    </div>
+                    <div class="form-group">
                         <label>Nuevo Peso Promedio Muestreado (Gramos):</label>
                         <input type="number" id="form_peso" value="${u.peso}" min="0" step="0.01">
                     </div>
@@ -464,6 +468,7 @@
         `;
 
         const inMuertes = document.getElementById('form_muertes');
+        const inSiembra = document.getElementById('form_siembra');
         const inPeso = document.getElementById('form_peso');
         const inVivosCalc = document.getElementById('form_vivos_calc');
         const inBiomasaCalc = document.getElementById('form_biomasa_calc');
@@ -471,9 +476,10 @@
         function procesarCalculo() {
             const base = parseInt(u.vivos) || 0;
             const muertes = parseInt(inMuertes.value) || 0;
+            const siembra = parseInt(inSiembra.value) || 0;
             const pesoGramos = parseFloat(inPeso.value) || 0;
 
-            const remanente = base - muertes;
+            const remanente = (base + siembra) - muertes;
             inVivosCalc.value = remanente < 0 ? 0 : remanente;
 
             const biomasaKg = (inVivosCalc.value * pesoGramos) / 1000;
@@ -481,14 +487,15 @@
         }
 
         inMuertes.addEventListener('input', procesarCalculo);
+        inSiembra.addEventListener('input', procesarCalculo);
         inPeso.addEventListener('input', procesarCalculo);
 
         document.getElementById('btnGuardarFirestore').addEventListener('click', () => {
-            ejecutarGuardado(key, inMuertes.value, inVivosCalc.value, inPeso.value, inBiomasaCalc.value);
+            ejecutarGuardado(key, inMuertes.value, inSiembra.value, inVivosCalc.value, inPeso.value, inBiomasaCalc.value);
         });
     }
 
-    async function ejecutarGuardado(key, muertes, vivos, peso, biomasa) {
+    async function ejecutarGuardado(key, muertes, siembra, vivos, peso, biomasa) {
         const btn = document.getElementById('btnGuardarFirestore');
         const alertOk = document.getElementById('okAlert');
         const alertErr = document.getElementById('errorAlert');
@@ -500,6 +507,7 @@
             id_unidad: clusterDatos[key].nombre,
             especie: clusterDatos[key].especie,
             muertes: parseInt(muertes) || 0,
+            peces_sembrados: parseInt(siembra) || 0,
             cantidad_peces_vivos: parseInt(vivos) || 0,
             peso_promedio_gramos: parseFloat(peso) || 0,
             biomasa_total_kilos: parseFloat(biomasa) || 0,
